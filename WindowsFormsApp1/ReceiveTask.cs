@@ -18,7 +18,7 @@ namespace WindowsFormsApp1
         }
 
         /* 非同期で受信待ちし、受信したらそれに応じた処理を行う */
-        public async void Receive()
+        public async void Receiver()
         {
             /* 人工的な無限ループのスレッド */
             await Task.Run(() =>

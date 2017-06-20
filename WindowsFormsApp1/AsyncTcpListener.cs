@@ -47,7 +47,12 @@ namespace WindowsFormsApp1
                 ((IPEndPoint)client.Client.RemoteEndPoint).Address,
                 ((IPEndPoint)client.Client.RemoteEndPoint).Port);
 
+            Send("OK");
+
             Debug.WriteLine("----------------接続OK----------------");
+
+            /* クライアントの受信待ち状態に移行 */
+            new ReceiveTask(this).Receiver();
         }
 
         /* 
@@ -110,10 +115,20 @@ namespace WindowsFormsApp1
             return resMsg;
         }
 
-        public void Disconnect()
+        public void HostDisConnect()
+        {
+            /* クライアント側に接続終了のタグを送る */
+            Send("<ENDCONNECTION>");
+        }
+
+        public void ClientDisconnect()
         {
             /* 閉じる */
             client.Close();
+
+            /* 
+             * QRコード表示
+             */
         }
     }
 }
