@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
+﻿using System.IO;
 using System.Diagnostics;
 using System.Text;
 using System.Net;
@@ -21,7 +18,7 @@ namespace WindowsFormsApp1
         public async void Listen()
         {
             //ListenするIPアドレス
-            string ipString = "10.4.1.22";
+            string ipString = "192.168.2.101";
             IPAddress ipAdd = IPAddress.Parse(ipString);
 
             //ホスト名からIPアドレスを取得する時は、次のようにする
@@ -52,7 +49,7 @@ namespace WindowsFormsApp1
             Debug.WriteLine("----------------接続OK----------------");
 
             /* クライアントの受信待ち状態に移行 */
-            new ReceiveTask(this).Receiver();
+            /* new ReceiveTask(this).Receiver(); */
         }
 
         /* 
@@ -88,19 +85,19 @@ namespace WindowsFormsApp1
             byte[] resBytes = new byte[256];
 
             /* データの一部を受信する */
-            int resSize = ns.Read(resBytes, 0, resBytes.Length);
+            int resSize = 0;
 
             /* 戻り値にする受信データ格納用 */
             string resMsg = "NONE";
             
             /* 読み取り可能なデータ、または読み取れるデータがある場合は受信を続ける */
-            while(resSize > 0 || ns.DataAvailable)
+            while(ns.DataAvailable)
             {
-                /* 受信したデータを蓄積する */
-                ms.Write(resBytes, 0, resSize);
-                
                 /* 再びデータを受信する */
                 resSize = ns.Read(resBytes, 0, resBytes.Length);
+
+                /* 受信したデータを蓄積する */
+                ms.Write(resBytes, 0, resSize);
             }
 
             /* 受信したデータを文字列に変換し格納 */

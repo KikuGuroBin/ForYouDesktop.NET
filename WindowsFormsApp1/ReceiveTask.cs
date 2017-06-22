@@ -40,7 +40,7 @@ namespace WindowsFormsApp1
                     /* 受信したデータがない場合 */
                     else if (data.Equals("NONE"))
                     {
-
+                        continue;
                     }
                     else
                     {
