@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
@@ -9,12 +10,12 @@ namespace WindowsFormsApp1
     /* クライアントからの受信待ちする */
     public class ReceiveTask
     {
-        private AsyncTcpListener Listener;
+        private AsyncTcpListener listener;
 
         /* コンストラクタ */
-        public ReceiveTask(AsyncTcpListener Listener)
+        public ReceiveTask(AsyncTcpListener listener)
         {
-            this.Listener = Listener;
+            this.listener = listener;
         }
 
         /* 非同期で受信待ちし、受信したらそれに応じた処理を行う */
@@ -26,7 +27,7 @@ namespace WindowsFormsApp1
                 while (true)
                 {
                     /* クライアントからの受信データを取得 */
-                    string data = Listener.Receive();
+                    string data = listener.Receive();
 
                     /* クライアント側が切断要求をした場合 */
                     if (data.IndexOf("<ENDCONNECTION>") > -1)
@@ -49,6 +50,10 @@ namespace WindowsFormsApp1
                          * ↓
                          * アクティブウィンドウに文字を送る
                          */
+
+                        /* デバッグ用 */
+                        Debug.WriteLine("--------------------受信したデータ--------------------");
+                        Debug.WriteLine(data);
                     }
                 }
             });

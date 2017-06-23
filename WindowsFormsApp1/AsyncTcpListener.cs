@@ -18,7 +18,7 @@ namespace WindowsFormsApp1
         public async void Listen()
         {
             //ListenするIPアドレス
-            string ipString = "192.168.2.101";
+            string ipString = "10.3.1.12";
             IPAddress ipAdd = IPAddress.Parse(ipString);
 
             //ホスト名からIPアドレスを取得する時は、次のようにする
@@ -43,13 +43,15 @@ namespace WindowsFormsApp1
             Debug.WriteLine("クライアント({0}:{1})と接続しました。",
                 ((IPEndPoint)client.Client.RemoteEndPoint).Address,
                 ((IPEndPoint)client.Client.RemoteEndPoint).Port);
+            
+            Receive();
 
-            Send("OK");
+            /* Send("OK"); */
 
             Debug.WriteLine("----------------接続OK----------------");
 
             /* クライアントの受信待ち状態に移行 */
-            /* new ReceiveTask(this).Receiver(); */
+            new ReceiveTask(this).Receiver();
         }
 
         /* 
@@ -74,7 +76,13 @@ namespace WindowsFormsApp1
         /* 受信用 */
         public string Receive()
         {
+
+            Debug.WriteLine(client);
+
             /* NetworkStreamを取得 */
+            /* エラー
+             * つながれていないSocketと通信できない <- ????? 
+             */
             NetworkStream ns = client.GetStream();
             /* タイムアウト設定 */
             ns.ReadTimeout = 30000;
