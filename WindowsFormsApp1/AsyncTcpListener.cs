@@ -8,6 +8,7 @@ namespace WindowsFormsApp1
 {
     public class AsyncTcpListener
     {
+        
         /* Listenするポート番号定数 */
         private const int PORT = 55555;
 
@@ -17,10 +18,9 @@ namespace WindowsFormsApp1
         /* ソケット通信におけるListen用 */
         public async void Listen()
         {
-            //ListenするIPアドレス
-            string ipString = "10.3.1.12";
-            IPAddress ipAdd = IPAddress.Parse(ipString);
+            IPAddress ipAdd = new IP_get_class().Ipget();
 
+            Debug.WriteLine(ipAdd.ToString());
             //ホスト名からIPアドレスを取得する時は、次のようにする
             //string host = "localhost";
             //System.Net.IPAddress ipAdd =
@@ -44,7 +44,7 @@ namespace WindowsFormsApp1
                 ((IPEndPoint)client.Client.RemoteEndPoint).Address,
                 ((IPEndPoint)client.Client.RemoteEndPoint).Port);
             
-            Receive();
+            /* Receive(); */
 
             /* Send("OK"); */
 
@@ -76,13 +76,7 @@ namespace WindowsFormsApp1
         /* 受信用 */
         public string Receive()
         {
-
-            Debug.WriteLine(client);
-
             /* NetworkStreamを取得 */
-            /* エラー
-             * つながれていないSocketと通信できない <- ????? 
-             */
             NetworkStream ns = client.GetStream();
             /* タイムアウト設定 */
             ns.ReadTimeout = 30000;
@@ -115,7 +109,6 @@ namespace WindowsFormsApp1
             }
 
             ms.Close();
-            ns.Close();
 
             return resMsg;
         }

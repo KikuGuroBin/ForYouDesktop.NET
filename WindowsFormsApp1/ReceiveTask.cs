@@ -48,9 +48,12 @@ namespace WindowsFormsApp1
                         /* 
                          * エスケープ処理
                          * ↓
+                         * 
                          * アクティブウィンドウに文字を送る
                          */
+                       // Microsoft.VisualBasic.Interaction.AppActivate("TeraPad");
 
+                        System.Windows.Forms.SendKeys.SendWait(data);
                         /* デバッグ用 */
                         Debug.WriteLine("--------------------受信したデータ--------------------");
                         Debug.WriteLine(data);
