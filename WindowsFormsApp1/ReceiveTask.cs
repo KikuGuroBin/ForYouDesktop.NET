@@ -4,18 +4,53 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace WindowsFormsApp1
 {
     /* クライアントからの受信待ちする */
     public class ReceiveTask
     {
-        private AsyncTcpListener listener;
-
+        private AsyncTcpListener Listener;
+        Hashtable ht = new Hashtable();
         /* コンストラクタ */
-        public ReceiveTask(AsyncTcpListener listener)
+        public ReceiveTask(AsyncTcpListener Listener)
         {
-            this.listener = listener;
+            ht.Add("<ENT>", "{ENTER}");
+            ht.Add("<DEL>", "{BACKSPACE}");
+            ht.Add("<CON>", "<CONV>");
+            ht.Add("<COP>", "^c");
+            ht.Add("<CUT>", "^x");
+            ht.Add("<PAS>", "^v");
+            ht.Add("<END>", "< ENDCONNECTION >");
+
+            /*
+            ht.Add("{BACKSPACE}", "{BACKSPACE}");
+
+            
+            ht.Add("{UP}", "{UP}");
+            ht.Add("{DOWN}", "{DOWN}");
+            ht.Add("{RIGHT}", "{RIGHT}");
+            ht.Add("{LETF}", "{LEFT}");
+            ht.Add("{TUB}", "{TAB}");
+           
+            ht.Add("{SAVEADD}", "{BACKSPACE}");
+            ht.Add("{SAVE}", "{BACKSPACE}");
+            ht.Add("{SEARCH}", "{BACKSPACE}");
+            ht.Add("{BACK}", "{BACKSPACE}");
+            ht.Add("{ALT}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+            ht.Add("{RENEW}", "{BACKSPACE}");
+             
+             
+             */
+
+
+            this.Listener = Listener;
         }
 
         /* 非同期で受信待ちし、受信したらそれに応じた処理を行う */
@@ -27,16 +62,29 @@ namespace WindowsFormsApp1
                 while (true)
                 {
                     /* クライアントからの受信データを取得 */
-                    string data = listener.Receive();
-
-                    /* クライアント側が切断要求をした場合 */
-                    if (data.IndexOf("<ENDCONNECTION>") > -1)
+                    string data = Listener.Receive();
+                    /*タグが含まれていた場合*/
+                    if (ht.ContainsKey(data))
                     {
-                        /* 
-                         * 切断処理 
-                         * ↓
-                         * QRの表示
-                         */
+                        /* クライアント側が切断要求をした場合 */
+                        if (((string)ht[data]).IndexOf("<ENDCONNECTION>") > -1)
+                        {
+                            /* 
+                             * 切断処理 
+                             * ↓
+                             * QRの表示
+                             */
+
+                            break;
+                        }else if (((string)ht[data]).Equals("<CONV>"))
+                        {
+
+                        }
+                        else
+                        {
+                            System.Windows.Forms.SendKeys.SendWait((string)ht[data]);
+                        }
+
                     }
                     /* 受信したデータがない場合 */
                     else if (data.Equals("NONE"))
@@ -51,7 +99,8 @@ namespace WindowsFormsApp1
                          * 
                          * アクティブウィンドウに文字を送る
                          */
-                       // Microsoft.VisualBasic.Interaction.AppActivate("TeraPad");
+                        // Microsoft.VisualBasic.Interaction.AppActivate("TeraPad");
+                        
 
                         System.Windows.Forms.SendKeys.SendWait(data);
                         /* デバッグ用 */
@@ -60,6 +109,9 @@ namespace WindowsFormsApp1
                     }
                 }
             });
+            Debug.WriteLine("あああああああああああああああああああああああああ");
+            Listener.ClientDisconnect();
+
         }
     }
 }

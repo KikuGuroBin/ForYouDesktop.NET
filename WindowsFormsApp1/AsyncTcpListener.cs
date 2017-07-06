@@ -8,10 +8,10 @@ namespace WindowsFormsApp1
 {
     public class AsyncTcpListener
     {
+        public Form1 form;
         
         /* Listenするポート番号定数 */
         private const int PORT = 55555;
-
         private TcpListener listener;
         private TcpClient client;
 
@@ -21,15 +21,6 @@ namespace WindowsFormsApp1
             IPAddress ipAdd = new IP_get_class().Ipget();
 
             Debug.WriteLine(ipAdd.ToString());
-            //ホスト名からIPアドレスを取得する時は、次のようにする
-            //string host = "localhost";
-            //System.Net.IPAddress ipAdd =
-            //    System.Net.Dns.GetHostEntry(host).AddressList[0];
-            //.NET Framework 1.1以前では、以下のようにする
-            //System.Net.IPAddress ipAdd =
-            //    System.Net.Dns.Resolve(host).AddressList[0];
-            
-            /* TcpListenerオブジェクトを作成する */
             listener = new TcpListener(ipAdd, PORT);
 
             /* Listenを開始する */
@@ -49,9 +40,15 @@ namespace WindowsFormsApp1
             /* Send("OK"); */
 
             Debug.WriteLine("----------------接続OK----------------");
+            form.notifyIcon1.BalloonTipText = "接続に成功しました";
+            form.notifyIcon1.ShowBalloonTip(500);
+            
+            form.ShowInTaskbar = false;
+            form.Hide();
 
             /* クライアントの受信待ち状態に移行 */
             new ReceiveTask(this).Receiver();
+            
         }
 
         /* 
@@ -123,6 +120,17 @@ namespace WindowsFormsApp1
         {
             /* 閉じる */
             client.Close();
+            listener.Stop();
+            listener = null;
+            form.notifyIcon1.BalloonTipText="切断されました";
+            form.notifyIcon1.ShowBalloonTip(2);
+            form.ShowInTaskbar = true;
+            form.WindowState = System.Windows.Forms.FormWindowState.Normal;
+            form.Show();
+            Listen();
+            //form.Visible = true;
+            //form.pictureBox1.Image = (new QR_Creater()).CrGet(((new IP_get_class()).Ipget()).ToString());
+
 
             /* 
              * QRコード表示
