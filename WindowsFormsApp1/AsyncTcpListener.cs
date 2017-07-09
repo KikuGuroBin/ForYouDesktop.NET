@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace WindowsFormsApp1
 {
@@ -12,8 +13,8 @@ namespace WindowsFormsApp1
         
         /* Listenするポート番号定数 */
         private const int PORT = 55555;
-        private TcpListener listener;
-        private TcpClient client;
+        private TcpListener Listener;
+        private TcpClient Client;
 
         /* ソケット通信におけるListen用 */
         public async void Listen()
@@ -21,19 +22,19 @@ namespace WindowsFormsApp1
             IPAddress ipAdd = new IP_get_class().Ipget();
 
             Debug.WriteLine(ipAdd.ToString());
-            listener = new TcpListener(ipAdd, PORT);
+            Listener = new TcpListener(ipAdd, PORT);
 
             /* Listenを開始する */
-            listener.Start();
+            Listener.Start();
             Debug.WriteLine("Listenを開始しました({0}:{1})。",
-                ((IPEndPoint)listener.LocalEndpoint).Address,
-                ((IPEndPoint)listener.LocalEndpoint).Port);
+                ((IPEndPoint)Listener.LocalEndpoint).Address,
+                ((IPEndPoint)Listener.LocalEndpoint).Port);
 
             /* 接続要求があったら受け入れる */
-            client = await listener.AcceptTcpClientAsync();
+            Client = await Listener.AcceptTcpClientAsync();
             Debug.WriteLine("クライアント({0}:{1})と接続しました。",
-                ((IPEndPoint)client.Client.RemoteEndPoint).Address,
-                ((IPEndPoint)client.Client.RemoteEndPoint).Port);
+                ((IPEndPoint)Client.Client.RemoteEndPoint).Address,
+                ((IPEndPoint)Client.Client.RemoteEndPoint).Port);
             
             /* Receive(); */
 
@@ -58,7 +59,7 @@ namespace WindowsFormsApp1
         public void Send(string data)
         {
             /* NetworkStreamを取得 */
-            NetworkStream ns = client.GetStream();
+            NetworkStream ns = Client.GetStream();
             /* タイムアウト設定 */
             ns.WriteTimeout = 30000;
 
@@ -74,7 +75,7 @@ namespace WindowsFormsApp1
         public string Receive()
         {
             /* NetworkStreamを取得 */
-            NetworkStream ns = client.GetStream();
+            NetworkStream ns = Client.GetStream();
             /* タイムアウト設定 */
             ns.ReadTimeout = 30000;
 
@@ -110,18 +111,30 @@ namespace WindowsFormsApp1
             return resMsg;
         }
 
+        /* 実験用 */
+        public async Task<string> Receive2()
+        {
+            NetworkStream ns = Client.GetStream();
+
+            byte[] buffer = new byte[256];
+
+            int s = await ns.ReadAsync(buffer, 0, buffer.Length);
+
+            return "aa";
+        }
+
         public void HostDisConnect()
         {
             /* クライアント側に接続終了のタグを送る */
-            Send("<ENDCONNECTION>");
+            Send("<END>");
         }
 
         public void ClientDisconnect()
         {
             /* 閉じる */
-            client.Close();
-            listener.Stop();
-            listener = null;
+            Client.Close();
+            Listener.Stop();
+            Listener = null;
             form.notifyIcon1.BalloonTipText="切断されました";
             form.notifyIcon1.ShowBalloonTip(2);
             form.ShowInTaskbar = true;

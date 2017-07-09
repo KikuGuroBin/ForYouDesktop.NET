@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System.Drawing;
 
 using ThoughtWorks.QRCode.Codec;
-using ThoughtWorks.QRCode.Codec.Data;
-using ThoughtWorks.QRCode.Codec.Util;
 
 namespace WindowsFormsApp1
 {

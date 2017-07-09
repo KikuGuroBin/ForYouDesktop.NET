@@ -9,14 +9,10 @@ namespace WindowsFormsApp1
 {
     class IP_get_class
     {
-        public  IP_get_class()
-        {
-        }
         public IPAddress Ipget()
         {
             //ListenするIPアドレス
-            string ipString = "10.4.1.131";
-            IPAddress ipAdd = IPAddress.Parse(ipString);
+            IPAddress ipAdd = null;
             IPAddress[] addresses = Dns.GetHostAddresses(Dns.GetHostName());
             foreach (IPAddress address in addresses)
             {
