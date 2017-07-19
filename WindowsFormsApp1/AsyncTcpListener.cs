@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Diagnostics;
 using System.Text;
 using System.Net;
@@ -49,6 +50,9 @@ namespace WindowsFormsApp1
 
             /* クライアントの受信待ち状態に移行 */
             new ReceiveTask(this).Receiver();
+
+            /* ホスト */
+            Send(Environment.UserName);
             
         }
 
@@ -110,19 +114,7 @@ namespace WindowsFormsApp1
 
             return resMsg;
         }
-
-        /* 実験用 */
-        public async Task<string> Receive2()
-        {
-            NetworkStream ns = Client.GetStream();
-
-            byte[] buffer = new byte[256];
-
-            int s = await ns.ReadAsync(buffer, 0, buffer.Length);
-
-            return "aa";
-        }
-
+        
         public void HostDisConnect()
         {
             /* クライアント側に接続終了のタグを送る */

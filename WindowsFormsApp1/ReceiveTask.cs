@@ -18,7 +18,8 @@ namespace WindowsFormsApp1
         public ReceiveTask(AsyncTcpListener Listener)
         {
             ht.Add("<ENT>", "{ENTER}");
-            ht.Add("<DEL>", "{BACKSPACE}");
+            ht.Add("<DEL>", "{DELETE}");
+            ht.Add("<BAC>", "{BACKSPACE}");
             ht.Add("<CON>", "<CON>");
             ht.Add("<COP>", "^c");
             ht.Add("<CUT>", "^x");
@@ -114,7 +115,7 @@ namespace WindowsFormsApp1
                             }
                         }
                         /* クライアントがバックスペースをした場合 */
-                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<DEL>")
+                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<BAC>")
                         {
                             /* 受信データを分割 */
                             string key = (string)ht[data.Substring(0, 5)];
@@ -130,7 +131,7 @@ namespace WindowsFormsApp1
                         }
                         else
                         {
-                            SendKeys.SendWait(((string)ht[data]).Remove(0, 5));
+                            SendKeys.SendWait(((string)ht[data]));
                         }
                     }
                     else
@@ -149,10 +150,5 @@ namespace WindowsFormsApp1
             Listener.ClientDisconnect();
             
         }
-    }
-
-    interface FuncInterface
-    {
-        void Process(string key);
     }
 }
