@@ -21,6 +21,7 @@ namespace WindowsFormsApp1
         public async void Listen()
         {
             IPAddress ipAdd = new IP_get_class().Ipget();
+            Debug.WriteLine(ipAdd);
 
             Debug.WriteLine(ipAdd.ToString());
             Listener = new TcpListener(ipAdd, PORT);
@@ -72,7 +73,6 @@ namespace WindowsFormsApp1
             /* データを送信する */
             ns.Write(sendBytes, 0, sendBytes.Length);
             
-            ns.Close();
         }
 
         /* 受信用 */

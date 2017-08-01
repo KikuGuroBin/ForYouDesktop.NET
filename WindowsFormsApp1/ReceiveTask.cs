@@ -21,9 +21,20 @@ namespace WindowsFormsApp1
             ht.Add("<DEL>", "{DELETE}");
             ht.Add("<BAC>", "{BACKSPACE}");
             ht.Add("<CON>", "<CON>");
+            ht.Add("<UPP>", "{UP}");
+            ht.Add("<DOW>", "{DOWN}");
+            ht.Add("<RIG>", "{RIGHT}");
+            ht.Add("<LEF>", "{LEFT}");
             ht.Add("<COP>", "^c");
+            ht.Add("<ALL>", "^a");
             ht.Add("<CUT>", "^x");
             ht.Add("<PAS>", "^v");
+            ht.Add("<SAV>", "^s");
+            ht.Add("<NSA>", "^n");
+            ht.Add("<OPN>", "^o");
+            ht.Add("<BEF>", "^z");
+            ht.Add("<AFT>", "^y");
+            ht.Add("<SEA>", "^F");
             ht.Add("<END>", "<END>");
 
             /*
@@ -115,7 +126,7 @@ namespace WindowsFormsApp1
                             }
                         }
                         /* クライアントがバックスペースをした場合 */
-                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<BAC>")
+                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<DEL>")
                         {
                             /* 受信データを分割 */
                             string key = (string)ht[data.Substring(0, 5)];
