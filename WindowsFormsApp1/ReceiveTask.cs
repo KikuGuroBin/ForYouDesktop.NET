@@ -30,11 +30,11 @@ namespace WindowsFormsApp1
             ht.Add("<CUT>", "^x");
             ht.Add("<PAS>", "^v");
             ht.Add("<SAV>", "^s");
-            ht.Add("<NSA>", "^n");
             ht.Add("<OPN>", "^o");
             ht.Add("<BEF>", "^z");
             ht.Add("<AFT>", "^y");
-            ht.Add("<SEA>", "^F");
+            ht.Add("<SEA>", "^f");
+            ht.Add("<NEW>", "^n");
             ht.Add("<END>", "<END>");
 
             /*
@@ -70,15 +70,15 @@ namespace WindowsFormsApp1
         public async void Receiver()
         {
             /* 人工的な無限ループのスレッド */
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 while (true)
                 {
                     /* クライアントからの受信データを取得 */
-                    string data = Listener.Receive();
+                    string data = await Listener.Receive();
 
                     /* 受信したデータがない場合 */
-                    if (data.Equals("NONE"))
+                    if (data.Equals("<NONE>"))
                     {
                         continue;
                     }
@@ -95,7 +95,7 @@ namespace WindowsFormsApp1
                         {
                             /* 受信データ分割 */
                             string[] work = Microsoft.VisualBasic.Strings.Split(data, "<>");
-                            
+
                             /* カーソル移動用 */
                             int rCount = int.Parse(work[1]);
                             /* 文字削除用 */
@@ -126,7 +126,7 @@ namespace WindowsFormsApp1
                             }
                         }
                         /* クライアントがバックスペースをした場合 */
-                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<DEL>")
+                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<BAC>")
                         {
                             /* 受信データを分割 */
                             string key = (string)ht[data.Substring(0, 5)];
@@ -140,6 +140,7 @@ namespace WindowsFormsApp1
                                 SendKeys.SendWait(key);
                             }
                         }
+                        /* その他のコマンド(ショートカットなど)が送られてきた場合 */
                         else
                         {
                             SendKeys.SendWait(((string)ht[data]));
@@ -152,14 +153,13 @@ namespace WindowsFormsApp1
                          * ↓
                          * アクティブウィンドウに文字を送る
                          */
-                        // Microsoft.VisualBasic.Interaction.AppActivate("TeraPad");
-                        
+
                         SendKeys.SendWait(data);
                     }
                 }
             });
             Listener.ClientDisconnect();
-            
+
         }
     }
 }

@@ -11,7 +11,7 @@ namespace WindowsFormsApp1
     public class AsyncTcpListener
     {
         public Form1 form;
-        
+
         /* Listenするポート番号定数 */
         private const int PORT = 55555;
         private TcpListener Listener;
@@ -21,7 +21,6 @@ namespace WindowsFormsApp1
         public async void Listen()
         {
             IPAddress ipAdd = new IP_get_class().Ipget();
-            Debug.WriteLine(ipAdd);
 
             Debug.WriteLine(ipAdd.ToString());
             Listener = new TcpListener(ipAdd, PORT);
@@ -37,7 +36,7 @@ namespace WindowsFormsApp1
             Debug.WriteLine("クライアント({0}:{1})と接続しました。",
                 ((IPEndPoint)Client.Client.RemoteEndPoint).Address,
                 ((IPEndPoint)Client.Client.RemoteEndPoint).Port);
-            
+
             /* Receive(); */
 
             /* Send("OK"); */
@@ -45,7 +44,7 @@ namespace WindowsFormsApp1
             Debug.WriteLine("----------------接続OK----------------");
             form.notifyIcon1.BalloonTipText = "接続に成功しました";
             form.notifyIcon1.ShowBalloonTip(500);
-            
+
             form.ShowInTaskbar = false;
             form.Hide();
 
@@ -54,7 +53,7 @@ namespace WindowsFormsApp1
 
             /* ホスト */
             Send(Environment.UserName);
-            
+
         }
 
         /* 
@@ -72,11 +71,12 @@ namespace WindowsFormsApp1
             byte[] sendBytes = Encoding.UTF8.GetBytes(data);
             /* データを送信する */
             ns.Write(sendBytes, 0, sendBytes.Length);
-            
+
+            //ns.Close();
         }
 
         /* 受信用 */
-        public string Receive()
+        public async Task<string> Receive()
         {
             /* NetworkStreamを取得 */
             NetworkStream ns = Client.GetStream();
@@ -86,35 +86,34 @@ namespace WindowsFormsApp1
             /* 受信データの一時格納用 */
             MemoryStream ms = new MemoryStream();
 
-            byte[] resBytes = new byte[256];
+            byte[] buffer = new byte[1024];
 
-            /* データの一部を受信する */
-            int resSize = 0;
+            int bytes = 0;
 
             /* 戻り値にする受信データ格納用 */
-            string resMsg = "NONE";
-            
+            string read = "<NONE>";
+
             /* 読み取り可能なデータ、または読み取れるデータがある場合は受信を続ける */
-            while(ns.DataAvailable)
+            while (ns.DataAvailable)
             {
-                /* 再びデータを受信する */
-                resSize = ns.Read(resBytes, 0, resBytes.Length);
+                /* データ受信 */
+                bytes = await ns.ReadAsync(buffer, 0, buffer.Length);
 
                 /* 受信したデータを蓄積する */
-                ms.Write(resBytes, 0, resSize);
+                ms.Write(buffer, 0, bytes);
             }
 
             /* 受信したデータを文字列に変換し格納 */
-            if (resSize > 0)
+            if (bytes > 0)
             {
-                resMsg = Encoding.UTF8.GetString(ms.GetBuffer(), 0, (int)ms.Length);
+                read = Encoding.UTF8.GetString(ms.GetBuffer(), 0, (int)ms.Length);
             }
 
             ms.Close();
 
-            return resMsg;
+            return read;
         }
-        
+
         public void HostDisConnect()
         {
             /* クライアント側に接続終了のタグを送る */
@@ -127,7 +126,7 @@ namespace WindowsFormsApp1
             Client.Close();
             Listener.Stop();
             Listener = null;
-            form.notifyIcon1.BalloonTipText="切断されました";
+            form.notifyIcon1.BalloonTipText = "切断されました";
             form.notifyIcon1.ShowBalloonTip(2);
             form.ShowInTaskbar = true;
             form.WindowState = System.Windows.Forms.FormWindowState.Normal;
