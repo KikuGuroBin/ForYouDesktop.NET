@@ -9,6 +9,7 @@ namespace WindowsFormsApp1
             //ListenするIPアドレス
             IPAddress ipAdd = null;
             IPAddress[] addresses = Dns.GetHostAddresses(Dns.GetHostName());
+            
             foreach (IPAddress address in addresses)
             {
                 // IPv4 のみを追加する

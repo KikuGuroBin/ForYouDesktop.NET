@@ -14,6 +14,7 @@ namespace WindowsFormsApp1
     {
         private AsyncTcpListener Listener;
         Hashtable ht = new Hashtable();
+        Boolean ShiftOnOff=false;
         /* コンストラクタ */
         public ReceiveTask(AsyncTcpListener Listener)
         {
@@ -36,6 +37,12 @@ namespace WindowsFormsApp1
             ht.Add("<SEA>", "^f");
             ht.Add("<NEW>", "^n");
             ht.Add("<END>", "<END>");
+            ht.Add("<TAB>", "%");
+            ht.Add("<CTA>", "^%{TAB}");
+            ht.Add("<SHI>", "+");
+            ht.Add("+", "{+}");
+            ht.Add("^", "{^}");
+            ht.Add("%", "{%}");
 
             /*
             ht.Add("{BACKSPACE}", "{BACKSPACE}");
@@ -117,8 +124,8 @@ namespace WindowsFormsApp1
                             }
 
                             /* 変換後の文字を挿入 */
-                            SendKeys.SendWait(work[3]);
-
+                            SendKeys.SendWait(Escape(work[3]));
+                            
                             /* カーソルをもとの位置まで戻す */
                             for (int i = 0; i < mCount; i++)
                             {
@@ -140,6 +147,34 @@ namespace WindowsFormsApp1
                                 SendKeys.SendWait(key);
                             }
                         }
+                        else if (data.StartsWith("<") && data.Substring(0, 5) == "<SHI>")
+                        {
+                            if (ShiftOnOff == false)
+                            {
+                                ShiftOnOff = true;
+                            }
+                            else
+                            {
+                                ShiftOnOff = false;
+                            }
+
+                        }
+                        else if (data.StartsWith("<") && (data.Substring(0, 5) == "<UPP>" ||
+                                                            data.Substring(0, 5) == "<DOW>" ||
+                                                            data.Substring(0, 5) == "<RIG>" ||
+                                                            data.Substring(0, 5) == "<LEF>" ||
+                                                            data.Substring(0, 5) == "<TAB>"))
+                        {
+                            if (ShiftOnOff == false)
+                            {
+                                SendKeys.SendWait(((string)ht[data]));
+                            }
+                            else
+                            {
+                                SendKeys.SendWait(("+" + (string)ht[data]));
+
+                            }
+                        }
                         /* その他のコマンド(ショートカットなど)が送られてきた場合 */
                         else
                         {
@@ -149,16 +184,39 @@ namespace WindowsFormsApp1
                     else
                     {
                         /* 
-                         * エスケープ処理
-                         * ↓
+                         * エスケープ処理*/
+                        if (data == "+" || data == "^"|| data == "%") {
+                            SendKeys.SendWait(((string)ht[data]));
+                        }
+
+                        /*
                          * アクティブウィンドウに文字を送る
                          */
-
-                        SendKeys.SendWait(data);
+                        else
+                        {
+                            SendKeys.SendWait(Escape(data));
+                        }
                     }
                 }
             });
             Listener.ClientDisconnect();
+
+        }
+        public String Escape(String data)
+        {
+            try
+            {
+                data.Replace("+", "{+}");
+                data.Replace("^", "{^}");
+                data.Replace("(", "{(}");
+                data.Replace(")", "{)}");
+            }
+            catch(Exception)
+            {
+
+            }
+
+            return data;
 
         }
     }

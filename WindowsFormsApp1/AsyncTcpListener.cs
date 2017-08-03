@@ -21,6 +21,8 @@ namespace WindowsFormsApp1
         public async void Listen()
         {
             IPAddress ipAdd = new IP_get_class().Ipget();
+           
+            
 
             Debug.WriteLine(ipAdd.ToString());
             Listener = new TcpListener(ipAdd, PORT);
