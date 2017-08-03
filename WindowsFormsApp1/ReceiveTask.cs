@@ -35,7 +35,7 @@ namespace WindowsFormsApp1
             ht.Add("<BEF>", "^z");
             ht.Add("<AFT>", "^y");
             ht.Add("<SEA>", "^f");
-            ht.Add("<NEW>", "^n");
+            ht.Add("<NSA>", "^n");
             ht.Add("<END>", "<END>");
             ht.Add("<TAB>", "%");
             ht.Add("<CTA>", "^%{TAB}");
