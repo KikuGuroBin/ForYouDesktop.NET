@@ -31,6 +31,8 @@ namespace WindowsFormsApp1
         /// </summary>
         private void InitializeComponent()
         {
+
+
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -102,6 +104,7 @@ namespace WindowsFormsApp1
             System.Diagnostics.Debug.WriteLine("あさあああああああああああああああああああああああああああああああああ");
             notifyIcon1.BalloonTipText = "終了します";
             notifyIcon1.ShowBalloonTip(5);
+            notifyIcon1.Dispose();
             Close();
             
 

@@ -23,6 +23,15 @@ namespace WindowsFormsApp1
             Debug.WriteLine(po);
             Debug.WriteLine(this.Location);
             this.pictureBox1.Image = (new QR_Creater()).CrGet(((new IP_get_class()).Ipget()).ToString());
+
+            //利用方法のバルーンチップ
+            ToolTip Qrtip =  new ToolTip(this.components);
+            Qrtip.IsBalloon = true;
+            Qrtip.ToolTipTitle = "ヒント";
+            Qrtip.ToolTipIcon = ToolTipIcon.Info;
+            Qrtip.SetToolTip(this.pictureBox1, "①スマートフォンとPCを同じWi-Fiに設定してください(PC優先でも可能)\n②スマートフォンアプリを起動し[wirelessmode]を選択してください\n③表示されているQRコードをスマートフォンで起動したカメラで読み取ってください\n④接続後は右下ツールバーにアイコンが表示されるのでお困りの際はそちらにマウスカーソルを合わせてください");
+            
+
             Listener = new AsyncTcpListener();
             Listener.form = this;
             Listener.Listen();

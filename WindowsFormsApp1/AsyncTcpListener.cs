@@ -129,7 +129,7 @@ namespace WindowsFormsApp1
             Listener.Stop();
             Listener = null;
             form.notifyIcon1.BalloonTipText = "切断されました";
-            form.notifyIcon1.ShowBalloonTip(2);
+            form.notifyIcon1.ShowBalloonTip(500);
             form.ShowInTaskbar = true;
             form.WindowState = System.Windows.Forms.FormWindowState.Normal;
             form.Show();
