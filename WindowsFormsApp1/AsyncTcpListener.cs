@@ -47,6 +47,10 @@ namespace WindowsFormsApp1
             form.notifyIcon1.BalloonTipText = "接続に成功しました";
             form.notifyIcon1.ShowBalloonTip(500);
 
+            form.notifyIcon1.BalloonTipText = "★接続中です★\n①いつも通りスマホのキーボードで入力が可能です。\n②終了の際は右下ツールバーにアイコンを右クリックして終了を押してください。";
+
+
+
             form.ShowInTaskbar = false;
             form.Hide();
 

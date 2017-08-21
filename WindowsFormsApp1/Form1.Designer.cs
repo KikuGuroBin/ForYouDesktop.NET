@@ -60,10 +60,13 @@ namespace WindowsFormsApp1
             // notifyIcon1
             // 
             this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.notifyIcon1.BalloonTipTitle = "";
+            this.notifyIcon1.BalloonTipText = "";
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "フリックサーバー";
             this.notifyIcon1.Visible = true;
+            this.notifyIcon1.Click += NotifyIcon1_RightClick;
             // 
             // contextMenuStrip1
             // 
@@ -97,6 +100,12 @@ namespace WindowsFormsApp1
             this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
+        }
+
+        private void NotifyIcon1_RightClick(object sender, EventArgs e)
+        {
+
+            this.notifyIcon1.ShowBalloonTip(500);
         }
 
         public void MouseEventHandle(object ob, EventArgs e)
