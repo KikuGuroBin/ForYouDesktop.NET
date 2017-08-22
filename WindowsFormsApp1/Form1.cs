@@ -17,6 +17,11 @@ namespace WindowsFormsApp1
         public Form1()
         {
             InitializeComponent();
+
+            this.Left = Screen.PrimaryScreen.Bounds.Width / 2 - 100;
+            this.Top = Screen.PrimaryScreen.Bounds.Height / 2 - 100;
+            this.StartPosition = FormStartPosition.Manual;
+            this.Show();
             /* AsyncSocketListener.StartListening(); */
             var po = new Point(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width - 200, System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 200);
             //this.Location = po;

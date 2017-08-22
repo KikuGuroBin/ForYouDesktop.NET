@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Windows.Forms;
 
 namespace WindowsFormsApp1
 {
@@ -31,8 +32,6 @@ namespace WindowsFormsApp1
         /// </summary>
         private void InitializeComponent()
         {
-
-
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -60,13 +59,10 @@ namespace WindowsFormsApp1
             // notifyIcon1
             // 
             this.notifyIcon1.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notifyIcon1.BalloonTipTitle = "";
-            this.notifyIcon1.BalloonTipText = "";
             this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "フリックサーバー";
             this.notifyIcon1.Visible = true;
-            this.notifyIcon1.Click += NotifyIcon1_RightClick;
             // 
             // contextMenuStrip1
             // 
@@ -81,13 +77,12 @@ namespace WindowsFormsApp1
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
             this.終了ToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.終了ToolStripMenuItem.Text = "終了";
-            //this.終了ToolStripMenuItem.Click += MouseEventHandle;
-            this.終了ToolStripMenuItem.Click += MouseEventHandle;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Highlight;
             this.ClientSize = new System.Drawing.Size(200, 200);
             this.ControlBox = false;
             this.Controls.Add(this.pictureBox1);
@@ -102,10 +97,11 @@ namespace WindowsFormsApp1
 
         }
 
-        private void NotifyIcon1_RightClick(object sender, EventArgs e)
+        private void RMouseclick(object sender, MouseEventArgs e)
         {
-
-            this.notifyIcon1.ShowBalloonTip(500);
+            if (e.Button==MouseButtons.Left) {
+                notifyIcon1.ShowBalloonTip(50);
+            }
         }
 
         public void MouseEventHandle(object ob, EventArgs e)
