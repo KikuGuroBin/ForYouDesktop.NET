@@ -63,6 +63,7 @@ namespace WindowsFormsApp1
             this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
             this.notifyIcon1.Text = "フリックサーバー";
             this.notifyIcon1.Visible = true;
+            this.notifyIcon1.MouseClick += RMouseclick;
             // 
             // contextMenuStrip1
             // 
@@ -77,6 +78,7 @@ namespace WindowsFormsApp1
             this.終了ToolStripMenuItem.Name = "終了ToolStripMenuItem";
             this.終了ToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
             this.終了ToolStripMenuItem.Text = "終了";
+            this.終了ToolStripMenuItem.Click += MouseEventHandle;
             // 
             // Form1
             // 
@@ -100,7 +102,7 @@ namespace WindowsFormsApp1
         private void RMouseclick(object sender, MouseEventArgs e)
         {
             if (e.Button==MouseButtons.Left) {
-                notifyIcon1.ShowBalloonTip(50);
+                notifyIcon1.ShowBalloonTip(5);
             }
         }
 
