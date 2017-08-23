@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Windows.Forms;
+using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace WindowsFormsApp1
 {
@@ -15,6 +17,14 @@ namespace WindowsFormsApp1
         private AsyncTcpListener Listener;
         Hashtable ht = new Hashtable();
         Boolean ShiftOnOff=false;
+        Boolean MouseFlg = false;
+        int MouseDownPoint = 0;
+        String NewMouseState = "";
+        int MousestateX = 0;
+        int MousestateY = 0;
+        private const int Mousedown = 0x2;
+        private const int Mouseup = 0x4;
+
         /* コンストラクタ */
         public ReceiveTask(AsyncTcpListener Listener)
         {
@@ -43,33 +53,6 @@ namespace WindowsFormsApp1
             ht.Add("+", "{+}");
             ht.Add("^", "{^}");
             ht.Add("%", "{%}");
-
-            /*
-            ht.Add("{BACKSPACE}", "{BACKSPACE}");
-
-            
-            ht.Add("{UP}", "{UP}");
-            ht.Add("{DOWN}", "{DOWN}");
-            ht.Add("{RIGHT}", "{RIGHT}");
-            ht.Add("{LETF}", "{LEFT}");
-            ht.Add("{TUB}", "{TAB}");
-           
-            ht.Add("{SAVEADD}", "{BACKSPACE}");
-            ht.Add("{SAVE}", "{BACKSPACE}");
-            ht.Add("{SEARCH}", "{BACKSPACE}");
-            ht.Add("{BACK}", "{BACKSPACE}");
-            ht.Add("{ALT}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-            ht.Add("{RENEW}", "{BACKSPACE}");
-             
-             
-             */
-
-
             this.Listener = Listener;
         }
 
@@ -89,6 +72,20 @@ namespace WindowsFormsApp1
                     {
                         continue;
                     }
+
+
+                    //マウスモードの時
+                    else if(MouseFlg==false&&data.Substring(0, 5).Equals("<MOD>"))
+                    {
+                        MouseFlg = true;
+                        MousemodeAsync();
+                    }
+                    else if (MouseFlg == true && (data.Substring(0, 5).Equals("<MOV>")|| data.Substring(0, 5).Equals("<MUP>")))
+                    {
+                        NewMouseState = data;
+                    }
+
+
                     /* タグが含まれていた場合 */
                     else if (data.StartsWith("<") && ht.ContainsKey(data.Substring(0, 5)))
                     {
@@ -125,7 +122,7 @@ namespace WindowsFormsApp1
 
                             /* 変換後の文字を挿入 */
                             SendKeys.SendWait(Escape(work[3]));
-                            
+
                             /* カーソルをもとの位置まで戻す */
                             for (int i = 0; i < mCount; i++)
                             {
@@ -185,7 +182,7 @@ namespace WindowsFormsApp1
                     {
                         /* 
                          * エスケープ処理*/
-                        if (data == "+" || data == "^"|| data == "%") {
+                        if (data == "+" || data == "^" || data == "%") {
                             SendKeys.SendWait(((string)ht[data]));
                         }
 
@@ -202,6 +199,51 @@ namespace WindowsFormsApp1
             Listener.ClientDisconnect();
 
         }
+        [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
+        static extern void SetCursorPos(int X, int Y);
+        [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
+        static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+        private async void MousemodeAsync()
+        {
+            
+            await Task.Run(() =>
+            {
+                int count = 0;
+                while (count != 500)
+                {
+                    if (NewMouseState.Substring(0, 5).Equals("<MUP>"))
+                    {
+                        int x= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[1]);
+                        int y= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[2]);
+                        if (Math.Abs(x) <= 2 && Math.Abs(y) <= 20)
+                        {
+                            SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                            mouse_event(Mouseup, 0, 0, 0, 0);
+                            MouseFlg = false;
+                            NewMouseState = "";
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    Thread.Sleep(1);
+                }
+                while(MouseFlg==true)
+                {
+                    int x = int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[1]);
+                    int y = int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[2]);
+                    SetCursorPos(Cursor.Position.X + x, Cursor.Position.Y + y);
+                }
+
+            });
+
+
+            throw new NotImplementedException();
+        }
+
+
+
         public String Escape(String data)
         {
             try
