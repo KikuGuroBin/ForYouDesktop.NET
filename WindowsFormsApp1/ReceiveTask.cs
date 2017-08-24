@@ -72,8 +72,8 @@ namespace WindowsFormsApp1
                     }
 
 
-                    //マウスモードの時
-                    else if (MouseFlg == false&&data.Substring(0, 5).Equals("<MDO>"))
+                    /*マウスモードの時*/
+                    else if (data.Substring(0, 5).Equals("<MDO>"))  //MouseFlg == false&&
                     {
                         MouseFlg = true;
                         NewMouseState = data;
@@ -87,6 +87,7 @@ namespace WindowsFormsApp1
                         System.Diagnostics.Debug.WriteLine(data +"うんこ");
                         Mouseposition = data;
                     }
+                    /*マウスここまで*/
 
 
                     /* タグが含まれていた場合 */
@@ -211,15 +212,17 @@ namespace WindowsFormsApp1
             await Task.Run(() =>
             {
                 int count = 0;
+
                 while (count != 500)
                 {
                     System.Diagnostics.Debug.WriteLine("deg : ReceiveTask.MouseMoveAsync : " + NewMouseState);
-
                     string s = NewMouseState.Substring(0, 5);
                     if (s.Equals("<MUP>"))
                     {
                         int x= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[1]);
                         int y= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[2]);
+
+                        
                         if (Math.Abs(x) <= 0.2 && Math.Abs(y) <= 0.2)
                         {
                             SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
@@ -239,29 +242,43 @@ namespace WindowsFormsApp1
                 }
                 while(MouseFlg==true)
                 {
-                    String[] moves = Microsoft.VisualBasic.Strings.Split(Mouseposition, "<MOV>");
-                    for(int a = 1; a < moves.Length-1; a++)
+                    if (Mouseposition!=null)
                     {
-                        int x = 0;
-                        int y = 0;
-                        if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1].Contains("<MUP>"))
+                        String[] moves = Microsoft.VisualBasic.Strings.Split(Mouseposition, "<MOV>");
+                        for (int a = 1; a < moves.Length - 1; a++)
                         {
-                            x = int.Parse(Microsoft.VisualBasic.Strings.Split(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1], "<MUP>")[0]);
+                            double x = 0;
+                            double y = 0;
+                            string[] movessplit = Microsoft.VisualBasic.Strings.Split(moves[a], "<>");
+
+                            if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1].Contains("<MUP>"))
+                            {
+                                x = double.Parse(Microsoft.VisualBasic.Strings.Split(movessplit[1], "<MUP>")[0]);
+                            }
+                            else
+                            {
+                                x = double.Parse(movessplit[1]);
+                            }
+                            if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2].Contains("<MUP>"))
+                            {
+                                y = double.Parse(Microsoft.VisualBasic.Strings.Split(movessplit[2], "<MUP>")[0]);
+                            }
+                            else
+                            {
+                                y = double.Parse(movessplit[2]);
+                            }
+
+
+
+                            SetCursorPos(Cursor.Position.X + (int)x, Cursor.Position.Y + (int)y);
+
+
+
                         }
-                        else
-                        {
-                            x = int.Parse(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1]);
-                        }
-                        if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2].Contains("<MUP>"))
-                        {
-                            y = int.Parse(Microsoft.VisualBasic.Strings.Split(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2], "<MUP>")[0]);
-                        }
-                        else
-                        {
-                            y = int.Parse(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2]);
-                        }
-                        SetCursorPos(Cursor.Position.X + x, Cursor.Position.Y + y);
+                        Mouseposition = null;
                     }
+                    
+
 
                     //SetCursorPos(50,50);
 
