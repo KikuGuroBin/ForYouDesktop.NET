@@ -19,9 +19,13 @@ namespace WindowsFormsApp1
         Boolean ShiftOnOff=false;
         Boolean MouseFlg = false;
         String NewMouseState = "";
-        String Mouseposition = "";
-        private const int Mousedown = 0x2;
-        private const int Mouseup = 0x4;
+        String Mouseposition = null;
+        private const int MouseLdown = 0x2;
+        private const int MouseLup = 0x4;
+        private const int MouseCdown = 0x20;
+        private const int MouseCup = 0x40;
+        private const int MouseRdown = 0x8;
+        private const int MouseRup = 0x10;
 
         /* コンストラクタ */
         public ReceiveTask(AsyncTcpListener Listener)
@@ -73,21 +77,52 @@ namespace WindowsFormsApp1
 
 
                     /*マウスモードの時*/
-                    else if (data.Substring(0, 5).Equals("<MDO>"))  //MouseFlg == false&&
+                    else if (data.StartsWith("<") && data.Substring(0, 5).Equals("<MDO>"))  //MouseFlg == false&&
                     {
-                        MouseFlg = true;
                         NewMouseState = data;
                         MousemodeAsync();
                     }
-                    else if (data.Substring(0, 5).Equals("<MUP>"))
+                    else if (data.StartsWith("<") && data.Substring(0, 5).Equals("<MUP>"))
                     {
                         NewMouseState = data;
-                    }else if ((data.Substring(0, 5).Equals("<MOV>")))
+                    }else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<MOV>")))
                     {
                         System.Diagnostics.Debug.WriteLine(data +"うんこ");
                         Mouseposition = data;
                     }
                     /*マウスここまで*/
+                    /*マウスクリック系モーション*/
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<CCU>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseCup, 0, 0, 0, 0);
+                    }
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<CCD>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseCdown, 0, 0, 0, 0);
+                    }
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<RCU>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseRup, 0, 0, 0, 0);
+                    }
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<RCD>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseRdown, 0, 0, 0, 0);
+                    }
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<LCU>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseLup, 0, 0, 0, 0);
+                    }
+                    else if (data.StartsWith("<") && (data.Substring(0, 5).Equals("<LCD>")))
+                    {
+                        SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
+                        mouse_event(MouseLdown, 0, 0, 0, 0);
+                    }
+
 
 
                     /* タグが含まれていた場合 */
@@ -219,27 +254,24 @@ namespace WindowsFormsApp1
                     string s = NewMouseState.Substring(0, 5);
                     if (s.Equals("<MUP>"))
                     {
-                        int x= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[1]);
-                        int y= int.Parse(Microsoft.VisualBasic.Strings.Split(NewMouseState, "<>")[2]);
-
-                        
-                        if (Math.Abs(x) <= 0.2 && Math.Abs(y) <= 0.2)
-                        {
                             SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
-                            mouse_event(Mousedown, 0, 0, 0, 0);
-                            mouse_event(Mouseup, 0, 0, 0, 0);
+                            mouse_event(MouseLdown, 0, 0, 0, 0);
+                            mouse_event(MouseLup, 0, 0, 0, 0);
                             MouseFlg = false;
                             NewMouseState = "";
                             break;
-                        }
-                        else
-                        {
-                            
-                        }
+                        
+                    }
+                    if (Mouseposition != null)
+                    {
+                        MouseFlg = true;
+                        break;
                     }
                     count++;
                     Thread.Sleep(1);
                 }
+
+
                 while(MouseFlg==true)
                 {
                     if (Mouseposition!=null)
@@ -268,12 +300,10 @@ namespace WindowsFormsApp1
                                 y = double.Parse(movessplit[2]);
                             }
 
-
-
-                            SetCursorPos(Cursor.Position.X + (int)x, Cursor.Position.Y + (int)y);
-
-
-
+                            for (int i = 0; i < 2; i++)
+                            {
+                                SetCursorPos(Cursor.Position.X + (int)(x), Cursor.Position.Y + (int)(y));
+                            }
                         }
                         Mouseposition = null;
                     }
