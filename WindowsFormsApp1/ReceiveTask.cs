@@ -16,8 +16,8 @@ namespace WindowsFormsApp1
     {
         private AsyncTcpListener Listener;
         Hashtable ht = new Hashtable();
-        Boolean ShiftOnOff=false;
-        Boolean MouseFlg = false;
+        bool ShiftOnOff=false;
+        bool MouseFlag = false;
         String NewMouseState = "";
         String Mouseposition = null;
         private const int MouseLdown = 0x2;
@@ -80,7 +80,7 @@ namespace WindowsFormsApp1
                     else if (data.StartsWith("<") && data.Substring(0, 5).Equals("<MDO>"))  //MouseFlg == false&&
                     {
                         NewMouseState = data;
-                        MousemodeAsync();
+                        await MousemodeAsync();
                     }
                     else if (data.StartsWith("<") && data.Substring(0, 5).Equals("<MUP>"))
                     {
@@ -242,7 +242,7 @@ namespace WindowsFormsApp1
         static extern void SetCursorPos(int X, int Y);
         [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
         static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-        private async void MousemodeAsync()
+        private async Task<bool> MousemodeAsync()
         {
             await Task.Run(() =>
             {
@@ -257,14 +257,14 @@ namespace WindowsFormsApp1
                             SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
                             mouse_event(MouseLdown, 0, 0, 0, 0);
                             mouse_event(MouseLup, 0, 0, 0, 0);
-                            MouseFlg = false;
+                            MouseFlag = false;
                             NewMouseState = "";
                             break;
                         
                     }
                     if (Mouseposition != null)
                     {
-                        MouseFlg = true;
+                        MouseFlag = true;
                         break;
                     }
                     count++;
@@ -272,7 +272,7 @@ namespace WindowsFormsApp1
                 }
 
 
-                while(MouseFlg==true)
+                while(MouseFlag==true)
                 {
                     if (Mouseposition!=null)
                     {
@@ -314,13 +314,13 @@ namespace WindowsFormsApp1
 
                     if (NewMouseState.Substring(0, 5).Equals("<MUP>"))
                     {
-                        MouseFlg = false;
+                        MouseFlag = false;
                         break;
                     }
                 }
 
             });
-           
+            return false;
         }
 
 

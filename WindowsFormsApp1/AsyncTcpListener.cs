@@ -56,9 +56,7 @@ namespace WindowsFormsApp1
 
             /* クライアントの受信待ち状態に移行 */
             new ReceiveTask(this).Receiver();
-
-            /* ホスト */
-            Send(Environment.UserName);
+            
 
         }
 
