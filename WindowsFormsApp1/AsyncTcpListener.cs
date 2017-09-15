@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
+using System.Collections;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -17,13 +18,13 @@ namespace WindowsFormsApp1
         private TcpListener Listener;
         private TcpClient Client;
 
+        private Queue ReceiveDatas;
+
         /* ソケット通信におけるListen用 */
         public async void Listen()
         {
             IPAddress ipAdd = new IP_get_class().Ipget();
            
-            
-
             Debug.WriteLine(ipAdd.ToString());
             Listener = new TcpListener(ipAdd, PORT);
 
@@ -48,18 +49,13 @@ namespace WindowsFormsApp1
             form.notifyIcon1.ShowBalloonTip(500);
 
             form.notifyIcon1.BalloonTipText = "★接続中です★\n①いつも通りスマホのキーボードで入力が可能です。\n②終了の際は右下ツールバーにアイコンを右クリックして終了を押してください。";
-
-
-
+            
             form.ShowInTaskbar = false;
             form.Hide();
 
             /* クライアントの受信待ち状態に移行 */
             new ReceiveTask(this).Receiver();
-
-            /* ホスト */
-            Send(Environment.UserName);
-
+            
         }
 
         /* 
@@ -91,23 +87,31 @@ namespace WindowsFormsApp1
 
             /* 受信データの一時格納用 */
             MemoryStream ms = new MemoryStream();
-
             byte[] buffer = new byte[1024];
-
             int bytes = 0;
 
             /* 戻り値にする受信データ格納用 */
             string read = "<NONE>";
 
-            /* 読み取り可能なデータ、または読み取れるデータがある場合は受信を続ける */
+            /* 読み取り可能なデータ、または読み取れるデータがある場合は受信を続ける 
             while (ns.DataAvailable)
             {
-                /* データ受信 */
+                /* データ受信 
                 bytes = await ns.ReadAsync(buffer, 0, buffer.Length);
 
-                /* 受信したデータを蓄積する */
+                /* 受信したデータを蓄積する
                 ms.Write(buffer, 0, bytes);
             }
+            */
+
+            /* 読み取り可能なデータが確認できるまで待つ */
+            await CheckStream(ns);
+
+            /* データ受信 */
+            bytes = await ns.ReadAsync(buffer, 0, buffer.Length);
+
+            /* 受信したデータを蓄積する */
+            ms.Write(buffer, 0, bytes);
 
             /* 受信したデータを文字列に変換し格納 */
             if (bytes > 0)
@@ -120,7 +124,44 @@ namespace WindowsFormsApp1
             return read;
         }
 
-        public void HostDisConnect()
+        private async Task<bool> CheckStream(NetworkStream ns)
+        {
+            await Task.Run(() =>
+            {
+                while (true)
+                {
+                    /* 読み取り可能なデータが確認できたらループを抜ける */
+                    if (ns.DataAvailable)
+                    {
+                        break;
+                    }
+                }
+            });
+
+            return false;
+        }
+
+        private async void ChargeReceiveData()
+        {
+            await Task.Run(async () =>
+            {
+                while (true)
+                {
+                    string data = await Receive();
+
+                    if (data.Contains("</>"))
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+            });
+        }
+
+        public void HostDisconnect()
         {
             /* クライアント側に接続終了のタグを送る */
             Send("<END>");

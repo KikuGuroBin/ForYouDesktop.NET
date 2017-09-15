@@ -16,8 +16,8 @@ namespace WindowsFormsApp1
     {
         private AsyncTcpListener Listener;
         Hashtable ht = new Hashtable();
-        Boolean ShiftOnOff=false;
-        Boolean MouseFlg = false;
+        bool ShiftOnOff=false;
+        bool MouseFlag = false;
         String NewMouseState = "";
         String Mouseposition = "";
         private const int Mousedown = 0x2;
@@ -73,9 +73,9 @@ namespace WindowsFormsApp1
 
 
                     //マウスモードの時
-                    else if (MouseFlg == false&&data.Substring(0, 5).Equals("<MDO>"))
+                    else if (MouseFlag == false && data.Substring(0, 5).Equals("<MDO>"))
                     {
-                        MouseFlg = true;
+                        MouseFlag = true;
                         NewMouseState = data;
                         MousemodeAsync();
                     }
@@ -87,8 +87,6 @@ namespace WindowsFormsApp1
                         System.Diagnostics.Debug.WriteLine(data +"うんこ");
                         Mouseposition = data;
                     }
-
-
                     /* タグが含まれていた場合 */
                     else if (data.StartsWith("<") && ht.ContainsKey(data.Substring(0, 5)))
                     {
@@ -199,6 +197,7 @@ namespace WindowsFormsApp1
                     }
                 }
             });
+
             Listener.ClientDisconnect();
 
         }
@@ -206,14 +205,14 @@ namespace WindowsFormsApp1
         static extern void SetCursorPos(int X, int Y);
         [DllImport("USER32.dll", CallingConvention = CallingConvention.StdCall)]
         static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
-        private async void MousemodeAsync()
+        private async Task<bool> MousemodeAsync()
         {
             await Task.Run(() =>
             {
                 int count = 0;
                 while (count != 500)
                 {
-                    System.Diagnostics.Debug.WriteLine("deg : ReceiveTask.MouseMoveAsync : " + NewMouseState);
+                    Debug.WriteLine("deg : ReceiveTask.MouseMoveAsync : " + NewMouseState);
 
                     string s = NewMouseState.Substring(0, 5);
                     if (s.Equals("<MUP>"))
@@ -225,7 +224,7 @@ namespace WindowsFormsApp1
                             SetCursorPos(Cursor.Position.X, Cursor.Position.Y);
                             mouse_event(Mousedown, 0, 0, 0, 0);
                             mouse_event(Mouseup, 0, 0, 0, 0);
-                            MouseFlg = false;
+                            MouseFlag = false;
                             NewMouseState = "";
                             break;
                         }
@@ -237,13 +236,17 @@ namespace WindowsFormsApp1
                     count++;
                     Thread.Sleep(1);
                 }
-                while(MouseFlg==true)
+
+                while(MouseFlag == true)
                 {
                     String[] moves = Microsoft.VisualBasic.Strings.Split(Mouseposition, "<MOV>");
                     for(int a = 1; a < moves.Length-1; a++)
                     {
                         int x = 0;
                         int y = 0;
+
+                        Debug.WriteLine("deg : " + moves[a]);
+
                         if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1].Contains("<MUP>"))
                         {
                             x = int.Parse(Microsoft.VisualBasic.Strings.Split(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1], "<MUP>")[0]);
@@ -252,6 +255,7 @@ namespace WindowsFormsApp1
                         {
                             x = int.Parse(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[1]);
                         }
+
                         if (Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2].Contains("<MUP>"))
                         {
                             y = int.Parse(Microsoft.VisualBasic.Strings.Split(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2], "<MUP>")[0]);
@@ -260,23 +264,23 @@ namespace WindowsFormsApp1
                         {
                             y = int.Parse(Microsoft.VisualBasic.Strings.Split(moves[a], "<>")[2]);
                         }
-                        SetCursorPos(Cursor.Position.X + x, Cursor.Position.Y + y);
+
+                        SetCursorPos(Cursor.Position.X + x/2, Cursor.Position.Y + y/2);
                     }
 
                     //SetCursorPos(50,50);
 
                     if (NewMouseState.Substring(0, 5).Equals("<MUP>"))
                     {
-                        MouseFlg = false;
+                        MouseFlag = false;
                         break;
                     }
                 }
 
             });
-           
+
+            return false;
         }
-
-
 
         public String Escape(String data)
         {
